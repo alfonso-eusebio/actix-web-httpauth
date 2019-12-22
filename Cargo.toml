@@ -1,6 +1,6 @@
 [package]
 name = "actix-web-httpauth"
-version = "0.3.2"
+version = "0.3.2-aw2"
 authors = ["svartalf <self@svartalf.info>"]
 description = "HTTP authentication schemes for actix-web"
 readme = "README.md"
@@ -14,10 +14,9 @@ exclude = [".travis.yml", ".gitignore"]
 edition = "2018"
 
 [dependencies]
-actix-web = { version = "^1.0", default_features = false }
-actix-service = "0.4.0"
-futures = "0.1"
-futures-locks = "0.3.3"
+actix-web = "2.0.0-rc"
+actix-service = "1.0.0"
+futures = "0.3.1"
 bytes = "0.4"
 base64 = "0.10"
 

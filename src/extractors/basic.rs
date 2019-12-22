@@ -11,6 +11,7 @@ use super::errors::AuthenticationError;
 use super::AuthExtractor;
 use crate::headers::authorization::{Authorization, Basic};
 use crate::headers::www_authenticate::basic::Basic as Challenge;
+use futures::future::{self, Ready};
 
 /// [`BasicAuth`] extractor configuration,
 /// used for [`WWW-Authenticate`] header later.
@@ -101,45 +102,46 @@ impl BasicAuth {
 }
 
 impl FromRequest for BasicAuth {
-    type Future = Result<Self, Self::Error>;
-    type Config = Config;
     type Error = AuthenticationError<Challenge>;
+    type Future = Ready<Result<Self, Self::Error>>;
+    type Config = Config;
 
-    fn from_request(
-        req: &HttpRequest,
-        _: &mut Payload,
-    ) -> <Self as FromRequest>::Future {
-        Authorization::<Basic>::parse(req)
-            .map(|auth| BasicAuth(auth.into_scheme()))
-            .map_err(|_| {
-                // TODO: debug! the original error
-                let challenge = req
-                    .app_data::<Self::Config>()
-                    .map(|config| config.0.clone())
-                    // TODO: Add trace! about `Default::default` call
-                    .unwrap_or_else(Default::default);
+    fn from_request(req: &HttpRequest, _: &mut Payload) -> Self::Future {
+        future::ready(
+            Authorization::<Basic>::parse(req)
+                .map(|auth| BasicAuth(auth.into_scheme()))
+                .map_err(|_| {
+                    // TODO: debug! the original error
+                    let challenge = req
+                        .app_data::<Self::Config>()
+                        .map(|config| config.0.clone())
+                        // TODO: Add trace! about `Default::default` call
+                        .unwrap_or_else(Default::default);
 
-                AuthenticationError::new(challenge)
-            })
+                    AuthenticationError::new(challenge)
+                }),
+        )
     }
 }
 
 impl AuthExtractor for BasicAuth {
     type Error = AuthenticationError<Challenge>;
-    type Future = Result<Self, Self::Error>;
+    type Future = Ready<Result<Self, Self::Error>>;
 
     fn from_service_request(req: &ServiceRequest) -> Self::Future {
-        Authorization::<Basic>::parse(req)
-            .map(|auth| BasicAuth(auth.into_scheme()))
-            .map_err(|_| {
-                // TODO: debug! the original error
-                let challenge = req
-                    .app_data::<Config>()
-                    .map(|config| config.0.clone())
-                    // TODO: Add trace! about `Default::default` call
-                    .unwrap_or_else(Default::default);
+        future::ready(
+            Authorization::<Basic>::parse(req)
+                .map(|auth| BasicAuth(auth.into_scheme()))
+                .map_err(|_| {
+                    // TODO: debug! the original error
+                    let challenge = req
+                        .app_data::<Config>()
+                        .map(|config| config.into_inner().0.clone())
+                        // TODO: Add trace! about `Default::default` call
+                        .unwrap_or_else(Default::default);
 
-                AuthenticationError::new(challenge)
-            })
+                    AuthenticationError::new(challenge)
+                }),
+        )
     }
 }
