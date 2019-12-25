@@ -70,11 +70,11 @@ impl AuthExtractorConfig for Config {
 /// ## Example
 ///
 /// ```rust
-/// use actix_web::{web, App};
+/// use actix_web::{web, App, HttpResponse};
 /// use actix_web_httpauth::extractors::basic::{BasicAuth, Config};
 ///
-/// fn index(auth: BasicAuth) -> String {
-///     format!("Hello, {}!", auth.user_id())
+/// async fn index(auth: BasicAuth) -> HttpResponse {
+///     HttpResponse::Ok().body(format!("Hello, {}!", auth.user_id()))
 /// }
 ///
 /// fn main() {

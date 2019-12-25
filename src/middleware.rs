@@ -6,8 +6,8 @@ use std::sync::Arc;
 use actix_service::{Service, Transform};
 use actix_web::dev::{ServiceRequest, ServiceResponse};
 use actix_web::Error;
-use futures::TryFutureExt;
 use futures::future::{self, Ready};
+use futures::TryFutureExt;
 
 use crate::extractors::{basic, bearer, AuthExtractor};
 use std::cell::RefCell;
@@ -65,7 +65,7 @@ where
     /// ```rust
     /// # use actix_web::Error;
     /// # use actix_web::dev::ServiceRequest;
-    /// # use futures::future::{self, FutureResult};
+    /// # use futures::future::{self, Ready};
     /// # use actix_web_httpauth::middleware::HttpAuthentication;
     /// # use actix_web_httpauth::extractors::basic::BasicAuth;
     /// // In this example validator returns immediately,
@@ -76,7 +76,7 @@ where
     /// fn validator(
     ///     req: ServiceRequest,
     ///     credentials: BasicAuth,
-    /// ) -> FutureResult<ServiceRequest, Error> {
+    /// ) -> Ready<Result<ServiceRequest, Error>> {
     ///     // All users are great and more than welcome!
     ///     future::ok(req)
     /// }
@@ -101,11 +101,11 @@ where
     /// ```rust
     /// # use actix_web::Error;
     /// # use actix_web::dev::ServiceRequest;
-    /// # use futures::future::{self, FutureResult};
+    /// # use futures::future::{self, Ready};
     /// # use actix_web_httpauth::middleware::HttpAuthentication;
     /// # use actix_web_httpauth::extractors::bearer::{Config, BearerAuth};
     /// # use actix_web_httpauth::extractors::{AuthenticationError, AuthExtractorConfig};
-    /// fn validator(req: ServiceRequest, credentials: BearerAuth) -> FutureResult<ServiceRequest, Error> {
+    /// fn validator(req: ServiceRequest, credentials: BearerAuth) -> Ready<Result<ServiceRequest, Error>> {
     ///     if credentials.token() == "mF_9.B5f-4.1JqM" {
     ///         future::ok(req)
     ///     } else {

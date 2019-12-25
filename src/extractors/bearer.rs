@@ -73,11 +73,11 @@ impl AuthExtractorConfig for Config {
 /// ## Example
 ///
 /// ```rust
-/// use actix_web::{web, App};
+/// use actix_web::{web, App, HttpResponse};
 /// use actix_web_httpauth::extractors::bearer::{BearerAuth, Config};
 ///
-/// fn index(auth: BearerAuth) -> String {
-///     format!("Hello, {}!", auth.token())
+/// fn index(auth: BearerAuth) -> HttpResponse {
+///     HttpResponse::Ok().body(format!("Hello, {}!", auth.token()))
 /// }
 ///
 /// fn main() {
